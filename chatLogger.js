@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Chat Logger
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      0.1
 // @description  try to take over the world!
 // @author       You
 // @match        https://picarto.tv/**USERNAME**
@@ -13,8 +13,7 @@
 (function() {
     'use strict';
     var storageName = "storedMsgArray";
-
-    //setTimeout(downloadMsgList, 3000);
+    
     setInterval(updateMsgList, 1000);
 
     function msgFormatter(str) {
@@ -25,15 +24,15 @@
         return newStr;
     }
 
-    function getStoredArray() { // Retrieve stored string and parse it into message array
+    function getStoredArray() {
         return JSON.parse(GM_getValue(storageName, []));
     }
 
-    function setStoredArray(arr) { // Stringify array and store it on disk
+    function setStoredArray(arr) {
         GM_setValue(storageName, JSON.stringify(arr));
     }
 
-    function getMsgObj(name, timestamp, msg, msgID) { // Create message object and return it
+    function getMsgObj(name, timestamp, msg, msgID) {
         return { "name":name, "timestamp":timestamp, "text":msg, "msgID":msgID };
     }
 
@@ -51,7 +50,7 @@
         return msgList;
     }
 
-    function updateMsgList() { // Main driver
+    function updateMsgList() {
         let oldList = getStoredArray();
         let newList = getMessages();
 
@@ -73,9 +72,14 @@
         }
 
         setStoredArray(oldList);
+
+        if(document.getElementById('msg').value === "/download") {
+            document.getElementById('msg').value = "";
+            downloadMsgList();
+        }
     }
 
-    function downloadMsgList() { // Function to download stored messages in txt file.  Formatted (timestamp) User: Message
+    function downloadMsgList() {
         let msgList = getStoredArray();
         let txtStr = ""
         for(let i = 0; i < msgList.length; i++) {
@@ -86,8 +90,7 @@
 
         var a = document.createElement("a");
         a.href = "data:text," + txtStr;
-        a.download = "Hello.txt";
+        a.download = "ChatLog.txt";
         a.click();
     }
-
 })();
